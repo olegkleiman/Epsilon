@@ -7,7 +7,9 @@ import {
 
 type State = {
   groups: [],
-  units: []
+  units: [],
+  selectedUnitId: String,
+  selectedGroupId: String
 }
 
 
@@ -55,7 +57,7 @@ class Start extends React.Component<{}, State> {
   }
 
   goToRegistration() {
-    this.props.history.push('/register');
+    this.props.history.push('/register/HXpindnz1bS43AUVCbMa/CEuoHGdpB5TdfycE6gOM');
   }
 
   render() {
