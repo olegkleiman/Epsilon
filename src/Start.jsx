@@ -2,6 +2,9 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
 import {
+  Card,
+  CardBody,
+  Container,
   Row,
   Col,
   Button,
@@ -50,13 +53,13 @@ class Start extends React.Component<{}, State> {
 
     try {
 
-      let dataUrl = 'http://us-central1-theta-1524876066401.cloudfunctions.net/api/groups';
+      let dataUrl = 'https://us-central1-theta-1524876066401.cloudfunctions.net/api/groups';
       const groups = await ::this.getDataAsJson(dataUrl)
       this.setState({
         groups: groups
       })
 
-      dataUrl = 'http://us-central1-theta-1524876066401.cloudfunctions.net/api/units'
+      dataUrl = 'https://us-central1-theta-1524876066401.cloudfunctions.net/api/units'
       const units = await ::this.getDataAsJson(dataUrl)
       this.setState({
         units: units
@@ -129,57 +132,56 @@ class Start extends React.Component<{}, State> {
     const groupsDropdownTitle = this.state.selectedGroup.symbol == '' ? 'Select Group'
                                                           : this.state.selectedGroup.symbol;
 
-    return(<React.Fragment>
-              <Row>
-                <Col>
-                  Select Unit
-                </Col>
-                <Col>
-                  <Dropdown isOpen={this.state.unitsDropdownOpen} toggle={::this.toggleUnits}>
-                    <DropdownToggle caret>
-                      {unitsDropdownTitle}
-                    </DropdownToggle>
-                    <DropdownMenu>
-                      {
-                        this.state.units.map( (unit, index) => {
-                          return <DropdownItem key={index}
-                                                onClick={()=> ::this.onUnitSelected(unit)}>
-                                        {unit.name}
-                                 </DropdownItem>
-                        })
-                      }
-                    </DropdownMenu>
-                  </Dropdown>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  Select group
-                </Col>
-                <Col>
-                  <Dropdown isOpen={this.state.groupsDropdownOpen} toggle={::this.toggleGroups}>
-                    <DropdownToggle caret>
-                      {groupsDropdownTitle}
-                    </DropdownToggle>
-                    <DropdownMenu>
-                      {
-                        this.state.availableGroups.map( (group, index) => {
-                          return <DropdownItem key={index}
-                                               onClick={()=> ::this.onGroupSelected(group)}>
-                                    {group.symbol}
-                                 </DropdownItem>
-                        })
-                      }
-                    </DropdownMenu>
-                  </Dropdown>
-                </Col>
-              </Row>
-            <Button
-              onClick={::this.goToRegistration}>
-              Go to registration
-            </Button>
-           </React.Fragment>
-    )
+     return (
+              <div className="d-flex align-items-center flex-column justify-content-center h-100 text-white start-wrapper">
+                <h1 className="display-4">רישום לקייטנות קיץ</h1>
+                  <div className='box'>
+                    <div className="form-group">
+                        <div>Select Unit</div>
+                        <Dropdown className="w-200" isOpen={this.state.unitsDropdownOpen} toggle={::this.toggleUnits}>
+                          <DropdownToggle caret>
+                            {unitsDropdownTitle}
+                          </DropdownToggle>
+                          <DropdownMenu right>
+                            {
+                              this.state.units.map( (unit, index) => {
+                                return <DropdownItem key={index}
+                                                      onClick={()=> ::this.onUnitSelected(unit)}>
+                                              {unit.name}
+                                       </DropdownItem>
+                              })
+                            }
+                          </DropdownMenu>
+                          </Dropdown>
+                    </div>
+                    <div className="form-group">
+                      <div>Select Group</div>
+                      <Dropdown className="w-200" isOpen={this.state.groupsDropdownOpen} toggle={::this.toggleGroups}>
+                        <DropdownToggle caret>
+                          {groupsDropdownTitle}
+                        </DropdownToggle>
+                        <DropdownMenu right>
+                          {
+                            this.state.availableGroups.map( (group, index) => {
+                              return <DropdownItem key={index}
+                                                   onClick={()=> ::this.onGroupSelected(group)}>
+                                        {group.symbol}
+                                     </DropdownItem>
+                            })
+                          }
+                        </DropdownMenu>
+                      </Dropdown>
+                    </div>
+                    <div className="form-group">
+                      <Button className="w-200"
+                        onClick={::this.goToRegistration}>
+                        Go to registration
+                      </Button>
+                    </div>
+                </div>
+              </div>
+            )
+
   }
 
 };
