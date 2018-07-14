@@ -22,6 +22,10 @@ type State = {
     name: String,
     id: String
   },
+  groupsDropdownOpen: Boolean,
+  selectedGroup: {
+    symbol: String
+  }
 }
 
 
@@ -35,6 +39,10 @@ class Start extends React.Component<{}, State> {
     selectedUnit: {
       name: '',
       id: ''
+    },
+    groupsDropdownOpen: false,
+    selectedGroup: {
+      symbol: ''
     }
   }
 
@@ -75,12 +83,19 @@ class Start extends React.Component<{}, State> {
   }
 
   goToRegistration() {
-    this.props.history.push('/register/23w');
+    const groupSymbol = this.state.selectedGroup.symbol
+    this.props.history.push('/register/' + groupSymbol);
   }
 
-  toggle() {
+  toggleUnits() {
      this.setState(prevState => ({
        unitsDropdownOpen: !prevState.unitsDropdownOpen
+     }));
+  }
+
+  toggleGroups() {
+     this.setState(prevState => ({
+       groupsDropdownOpen: !prevState.groupsDropdownOpen
      }));
   }
 
@@ -92,14 +107,27 @@ class Start extends React.Component<{}, State> {
 
     this.setState({
       availableGroups: _groups,
-      selectedUnit: unit
+      selectedUnit: unit,
+      selectedGroup: {
+        symbol: ''
+      }
     })
+  }
+
+  onGroupSelected = (group) => {
+
+    this.setState({
+      selectedGroup: group
+    });
+
   }
 
   render() {
 
     const unitsDropdownTitle = this.state.selectedUnit.name == '' ? 'Select Unit'
                                                           : this.state.selectedUnit.name;
+    const groupsDropdownTitle = this.state.selectedGroup.symbol == '' ? 'Select Group'
+                                                          : this.state.selectedGroup.symbol;
 
     return(<React.Fragment>
               <Row>
@@ -107,7 +135,7 @@ class Start extends React.Component<{}, State> {
                   Select Unit
                 </Col>
                 <Col>
-                  <Dropdown isOpen={this.state.unitsDropdownOpen} toggle={::this.toggle}>
+                  <Dropdown isOpen={this.state.unitsDropdownOpen} toggle={::this.toggleUnits}>
                     <DropdownToggle caret>
                       {unitsDropdownTitle}
                     </DropdownToggle>
@@ -124,13 +152,28 @@ class Start extends React.Component<{}, State> {
                   </Dropdown>
                 </Col>
               </Row>
-             <ul>
-              {
-                this.state.availableGroups.map( (group, index) => {
-                  return <li key={index}>{group.symbol}</li>
-                })
-              }
-            </ul>
+              <Row>
+                <Col>
+                  Select group
+                </Col>
+                <Col>
+                  <Dropdown isOpen={this.state.groupsDropdownOpen} toggle={::this.toggleGroups}>
+                    <DropdownToggle caret>
+                      {groupsDropdownTitle}
+                    </DropdownToggle>
+                    <DropdownMenu>
+                      {
+                        this.state.availableGroups.map( (group, index) => {
+                          return <DropdownItem key={index}
+                                               onClick={()=> ::this.onGroupSelected(group)}>
+                                    {group.symbol}
+                                 </DropdownItem>
+                        })
+                      }
+                    </DropdownMenu>
+                  </Dropdown>
+                </Col>
+              </Row>
             <Button
               onClick={::this.goToRegistration}>
               Go to registration
