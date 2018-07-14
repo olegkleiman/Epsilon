@@ -2,14 +2,26 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
 import {
-  Button
+  Row,
+  Col,
+  Button,
+  Dropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem
 } from 'reactstrap';
 
 type State = {
   groups: [],
+  availableGroups: [],
   units: [],
   selectedUnitId: String,
-  selectedGroupId: String
+  selectedGroupId: String,
+  unitsDropdownOpen: Boolean,
+  selectedUnit: {
+    name: String,
+    id: String
+  },
 }
 
 
@@ -17,7 +29,13 @@ class Start extends React.Component<{}, State> {
 
   state = {
     groups: [],
-    units: []
+    availableGroups: [],
+    units: [],
+    unitsDropdownOpen: false,
+    selectedUnit: {
+      name: '',
+      id: ''
+    }
   }
 
   async componentDidMount() {
@@ -57,21 +75,58 @@ class Start extends React.Component<{}, State> {
   }
 
   goToRegistration() {
-    this.props.history.push('/register/HXpindnz1bS43AUVCbMa/CEuoHGdpB5TdfycE6gOM');
+    this.props.history.push('/register/23w');
+  }
+
+  toggle() {
+     this.setState(prevState => ({
+       unitsDropdownOpen: !prevState.unitsDropdownOpen
+     }));
+  }
+
+  onUnitSelected = (unit) => {
+
+    const _groups = this.state.groups.filter( group => {
+      return group.unitId === unit.id
+    });
+
+    this.setState({
+      availableGroups: _groups,
+      selectedUnit: unit
+    })
   }
 
   render() {
+
+    const unitsDropdownTitle = this.state.selectedUnit.name == '' ? 'Select Unit'
+                                                          : this.state.selectedUnit.name;
+
     return(<React.Fragment>
+              <Row>
+                <Col>
+                  Select Unit
+                </Col>
+                <Col>
+                  <Dropdown isOpen={this.state.unitsDropdownOpen} toggle={::this.toggle}>
+                    <DropdownToggle caret>
+                      {unitsDropdownTitle}
+                    </DropdownToggle>
+                    <DropdownMenu>
+                      {
+                        this.state.units.map( (unit, index) => {
+                          return <DropdownItem key={index}
+                                                onClick={()=> ::this.onUnitSelected(unit)}>
+                                        {unit.name}
+                                 </DropdownItem>
+                        })
+                      }
+                    </DropdownMenu>
+                  </Dropdown>
+                </Col>
+              </Row>
              <ul>
               {
-                this.state.units.map( (unit, index) => {
-                  return <li key={index}>{unit.name}</li>
-                })
-              }
-             </ul>
-             <ul>
-              {
-                this.state.groups.map( (group, index) => {
+                this.state.availableGroups.map( (group, index) => {
                   return <li key={index}>{group.symbol}</li>
                 })
               }
