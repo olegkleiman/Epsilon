@@ -7,3 +7,4 @@ In 2 terminal windows, run <code>yarn build</code> and <code>sudo firebase serve
 
 ## Deploy
 <code>sudo firebase deploy</code>
+or publish to <a href='https://github.com/olegkleiman/Epsilon/tree/gh-pages'>ghPages</a> branch.
