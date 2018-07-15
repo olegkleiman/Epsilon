@@ -1,0 +1,32 @@
+body, html {
+  margin: 4px;
+  /* display: flex;
+  justify-content: center; */
+  height: 100%;
+  text-align: left;
+}
+
+.start-wrapper{
+  /* background-image: url('../images/background.webp'); */
+  background-image: url('../images/pencils.jpg');
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  height: 100vh;
+}
+
+.w-200 {
+  min-width: 200px;
+}
+
+.box {
+  background-color: midnightblue;
+  margin: 150px;
+  padding: 20px;
+}
+
+.box-wide {
+  background-color: midnightblue;
+  margin: 60px;
+  padding: 20px;
+}
