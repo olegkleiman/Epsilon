@@ -3,8 +3,14 @@ import React from 'react';
 import {
   Row, Col,
   Button,
-  Input
+  Input,
+  Form
 } from 'reactstrap';
+import Datetime from 'react-datetime';
+import 'react-datetime/css/react-datetime.css';
+import moment from 'moment';
+import _ from 'moment/locale/he';
+import classNames from 'classnames';
 
 type Group = {
   unitId: String,
@@ -15,13 +21,18 @@ type Group = {
 }
 
 type State = {
-  group: Group
+  group: Group,
+  bDay: Date,
+  activePageNumber: Number
 }
+
+const TOTAL_PAGES = 3;
 
 class Register extends React.Component<{}, State> {
 
   state = {
-    group: {}
+    group: {},
+    activePageNumber: 1
   }
 
   constructor(props) {
@@ -47,21 +58,40 @@ class Register extends React.Component<{}, State> {
     });
   }
 
-  register() {
+  bDayDateChanged(_date: Date) {
+
+    this.setState({
+      bDay: _date.toDate()
+    })
+
+  }
+
+  onFormSubmit = (event) => {
+
+    event.preventDefault(); // stop from further submit
+
     const groupSymbol = this.props.match.params.groupSymbol;
-    console.log(groupSymbol);
+    const pupilFullName = `${event.target.pupilName.value} ${event.target.pupilLastName.value}`;
 
     const pupil = {
       groupSymbol: groupSymbol,
-      address: '<none>',
-      name: 'Paul XV',
-      phoneNumber: '333'
+      name: pupilFullName,
+      pupilId: event.target.pupilTZ.value,
+      address: event.target.pupilAddress.value,
+      birthDay: moment(this.state.bDay).format('DD/MM/YYYY'),
+      phoneNumber: event.target.pupilPhone.value,
+      notices: event.target.notices.value,
+
+      parentId: event.target.parentTZ.value,
+
+      whenRegistered: moment().format('DD/MM/YYYY')
     }
 
     fetch('http://us-central1-theta-1524876066401.cloudfunctions.net/api/pupil?secret=Ep$ilon', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
       },
       body: JSON.stringify(pupil)
     })
@@ -83,65 +113,161 @@ class Register extends React.Component<{}, State> {
 
   }
 
+  pageChanged = (activePageNumber: number) => {
+
+    if( activePageNumber < TOTAL_PAGES + 1 ) {
+
+      this.setState({
+        activePageNumber: activePageNumber
+      });
+
+    }
+
+  }
+
   render() {
+
+    const firstPageClass = classNames({
+      'd-none': this.state.activePageNumber != 1
+    })
+    const secondPageClass = classNames({
+      'd-none': this.state.activePageNumber != 2
+    })
+    const thirdPageClass = classNames({
+      'd-none': this.state.activePageNumber != 3
+    })
+
     return (
       <div className="d-flex align-items-center flex-column justify-content-center h-100 text-white start-wrapper">
         <h1 className="display-4">רישום ל{this.state.group.name}</h1>
-        <div className='box'>
-          <div className="form-group">
-            <Row>
-              <Col className='col-4 text-right'>
-                <div>שם פרטי</div>
-                <div>
-                  <Input />
-                </div>
-              </Col>
-              <Col className='col-4 text-right'>
-                <div>שם משפחה</div>
-                <div>
-                  <Input />
-                </div>
-              </Col>
-              <Col className='col-4 text-right'>
-                <div>ת.זהות</div>
-                <div>
-                  <Input />
-                </div>
-              </Col>
-            </Row>
-          </div>
-          <div className="form-group">
-            <div className='text-right'>כתובת</div>
-            <div className="w-200">
-              <Input />
-            </div>
-          </div>
-          <div className="form-group">
-            <Row>
-              <Col className='col-6 text-right'>
-                <div>תאריך לידה</div>
+        <div className='box-wide'>
+          <Form onSubmit={::this.onFormSubmit}>
+
+            <div className={firstPageClass}>
+              <div className="form-group">
+                <Row>
+                  <Col className='col-12 text-center'>
+                    <h2>פרטי הנרשם/ת</h2>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col className='col-4 text-left'>
+                    <div>שם פרטי<span className='w3l-star'> * </span></div>
+                    <div>
+                      <Input id='pupilName' name='pupilName' />
+                    </div>
+                  </Col>
+                  <Col className='col-4 text-left'>
+                    <div>שם משפחה<span className='w3l-star'> * </span></div>
+                    <div>
+                      <Input id='pupilLastName' name='pupilLastName' />
+                    </div>
+                  </Col>
+                  <Col className='col-4 text-left'>
+                    <div>ת.זהות<span className='w3l-star'> * </span></div>
+                    <div>
+                      <Input id='pupilTZ' name='pupilTZ'  />
+                    </div>
+                  </Col>
+                </Row>
+              </div>
+              <div className="form-group">
+                <div className='text-left'>כתובת</div>
                 <div className="w-200">
-                  <Input />
+                  <Input id='pupilAddress' name='pupilAddress'/>
                 </div>
-              </Col>
-              <Col className='col-6 text-right'>
-                <div>טלפון בבית</div>
+              </div>
+              <div className="form-group">
+                <Row>
+                  <Col className='col-6 text-left'>
+                    <div>תאריך לידה</div>
+                    <div>
+                      <Datetime ref = { (el) => { this.bDayDateCtrl = el }}
+                                open={false}
+                                dateFormat="DD-MM-YYYY"
+                                timeFormat={false}
+                                onChange={::this.bDayDateChanged}
+                                closeOnSelect={true}
+                                local='he'/>
+                    </div>
+                  </Col>
+                  <Col className='col-6 text-left'>
+                    <div>טלפון בבית<span className='w3l-star'> * </span></div>
+                    <div className="w-200">
+                      <Input id='pupilPhone' name='pupilPhone' />
+                    </div>
+                  </Col>
+                </Row>
+              </div>
+              <div className="form-group">
+                <div className='text-left'>הערות</div>
                 <div className="w-200">
-                  <Input />
+                  <Input id='notices' name='notices'/>
                 </div>
-              </Col>
-            </Row>
-          </div>
-          <div className="form-group">
-            <div className='text-right'>הערות</div>
-            <div className="w-200">
-              <Input />
+              </div>
+
             </div>
-          </div>
-          <div className="form-group">
-            <Button className="w-200"
-              onClick={::this.register}>Register</Button>
-          </div>
+
+            <div className={secondPageClass}>
+              <div className="form-group">
+                <Row>
+                  <Col className='col-12 text-center'>
+                    <h2>פרטי ראש/ת-משפחה</h2>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col className='col-4 text-left'>
+                    <div>שם פרטי</div>
+                    <div>
+                      <Input />
+                    </div>
+                  </Col>
+                  <Col className='col-4 text-left'>
+                    <div>שם משפחה</div>
+                    <div>
+                      <Input />
+                    </div>
+                  </Col>
+                  <Col className='col-4 text-left'>
+                    <div><span className='w3l-star'> * </span>ת.זהות</div>
+                    <div>
+                      <Input name='parentTZ' id='parentTZ'/>
+                    </div>
+                  </Col>
+                </Row>
+              </div>
+            </div>
+
+            <div className={thirdPageClass}>
+              <div className="form-group">
+                <Row>
+                  <Col className='col-12 text-center'>
+                    <h2>פרטי תשלום</h2>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col className='col-4 text-left'>
+                  </Col>
+                </Row>
+              </div>
+            </div>
+
+            <div className="form-group">
+              <Row>
+                <Col className='col-4 text-left'>
+                  <Button onClick={ () => ::this.pageChanged(this.state.activePageNumber + 1) }>המשך</Button>
+                </Col>
+                <Col className='col-4 text-left'>
+                  <div className={thirdPageClass}>
+                    <Button className="w-200" type="submit">Register</Button>
+                  </div>
+                </Col>
+                <Col className='col-4 text-left'>
+                  <Button onClick={ () => ::this.pageChanged(this.state.activePageNumber - 1)}>קודם</Button>
+                </Col>
+              </Row>
+            </div>
+          </Form>
         </div>
 
       </div>
